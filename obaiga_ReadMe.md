@@ -48,6 +48,7 @@ show
 ```
 1.14.1
 2.3.1
+2.10.0
 
 [name: "/device:CPU:0"
 device_type: "CPU"
