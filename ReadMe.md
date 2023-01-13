@@ -68,6 +68,11 @@ incarnation: 6561882754128707177
 physical_device_desc: "device: 0, name: GeForce GTX 1080, pci bus id: 0000:01:00.0, compute capability: 6.1"
 ]
 ```
+
+## Install Spyder
+```
+conda install -c anaconda spyder
+```
 ## Issues
 1. Description:Failed to get convolution algorithm. This is probably because cuDNN failed to initialize, so try looking to see if a warning log message was printed above. #24828
 
