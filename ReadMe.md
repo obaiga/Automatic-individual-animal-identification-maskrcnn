@@ -1,13 +1,13 @@
-## Installation
+# Installation
 
-1. Anaconda version: Anaconda3-2020.02-Windows-x86_64
+## Anaconda version: Anaconda3-2020.02-Windows-x86_64
 
 Make sure that the installer adds Anaconda to the system PATH  
 Make sure that the installer registers it as your default Python
 
 If you already have an Anaconda. The installation path could be [the current Anaconda path] + [\envs], e.g. C:\Users\95316\Anaconda2\envs
 
-2. Requirement packages
+## Requirement packages
 ```
 conda create -n maskrcnn python=3.7.6
 conda activate maskrcnn
@@ -73,7 +73,7 @@ physical_device_desc: "device: 0, name: GeForce GTX 1080, pci bus id: 0000:01:00
 ```
 conda install -c anaconda spyder
 ```
-## Issues
+### Issues
 1. Description:Failed to get convolution algorithm. This is probably because cuDNN failed to initialize, so try looking to see if a warning log message was printed above. #24828
 
 Alternative description: Delete the underlying status object from memory otherwise it stays alives there is a reference to status from this from the traceback due to UnknownError: Failed to get convolution algorithm. This is probably because cuDNN failed to initialize, so try looking to see if a warning log message was printed above. [[{{node sequential_1_1/Conv1/convolution}}]] [[{{node loss/add_7}}]]
