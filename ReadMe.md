@@ -12,7 +12,7 @@ If you already have an Anaconda. The installation path could be [the current Ana
 conda create -n maskrcnn python=3.7.6
 conda activate maskrcnn
 
-pip install numpy==1.16.2
+pip install numpy
 pip install scipy
 pip install Pillow
 pip install cython
