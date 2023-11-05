@@ -79,3 +79,16 @@ conda install -c anaconda spyder
 Alternative description: Delete the underlying status object from memory otherwise it stays alives there is a reference to status from this from the traceback due to UnknownError: Failed to get convolution algorithm. This is probably because cuDNN failed to initialize, so try looking to see if a warning log message was printed above. [[{{node sequential_1_1/Conv1/convolution}}]] [[{{node loss/add_7}}]]
 
 Solution: Restart computer
+
+# Citation
+Use this bibtex to cite this repository:
+```
+@misc{matterport_maskrcnn_2017,
+  title={Mask R-CNN for object detection and instance segmentation on Keras and TensorFlow},
+  author={Waleed Abdulla},
+  year={2017},
+  publisher={Github},
+  journal={GitHub repository},
+  howpublished={\url{https://github.com/matterport/Mask_RCNN}},
+}
+```
