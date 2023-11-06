@@ -68,6 +68,15 @@ incarnation: 6561882754128707177
 physical_device_desc: "device: 0, name: GeForce GTX 1080, pci bus id: 0000:01:00.0, compute capability: 6.1"
 ]
 ```
+### Issue
+1. CommandNotFoundError: Your shell has not been properly configured to use 'conda activate'. To initialize your shell, run
+
+[Solution](https://github.com/conda/conda/issues/7980#issuecomment-441358406)
+```
+source ~/anaconda3/etc/profile.d/conda.sh
+conda activate maskrcnn
+```
+
 
 ## Install Spyder
 ```
