@@ -20,12 +20,13 @@ pip install scipy
 pip install Pillow
 pip install cython
 pip install matplotlib
-pip install scikit-image
 pip install opencv-python
 pip install imgaug
 pip install IPython
 ```
 ```
+conda install scikit-image=0.16.2
+
 conda install tensorflow==1.14.0
 conda install keras
 conda install tensorflow-gpu  ## for wins
