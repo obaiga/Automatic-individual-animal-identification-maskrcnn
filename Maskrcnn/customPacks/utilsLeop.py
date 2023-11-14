@@ -55,20 +55,20 @@ class LeopardDataset(utils.Dataset):
 
         for img_path in glob.iglob(img_source):    ### i means file name
             img_id = img_path[len(dataset_dir)+1:]
-#             img = skimage.io.imread(img_path)
-#             height,width = img.shape[:2]
+            img = skimage.io.imread(img_path)
+            height,width = img.shape[:2]
 
-            self.add_image(
-                source = "leopard",
-                image_id = img_id,          ### use file name as a unique image id
-                path = img_path)
+            # self.add_image(
+            #     source = "leopard",
+            #     image_id = img_id,          ### use file name as a unique image id
+            #     path = img_path)
     
-#                 self.add_image(
-#                 source = "leopard",
-#                 image_id = img_id,          ### use file name as a unique image id
-#                 path = img_path,
-#                 width = width, height = height)
-                ### requires: soource, id, path; (utils.py)
+            self.add_image(
+            source = "leopard",
+            image_id = img_id,          ### use file name as a unique image id
+            path = img_path,
+            width = width, height = height)
+            ## requires: soource, id, path; (utils.py)
     
     
     def load_polygon(self,img_id):
@@ -91,7 +91,7 @@ class LeopardDataset(utils.Dataset):
         name_lis = root.getElementsByTagName('name')
         for i in range(len(name_lis)):
             leopard_class = name_lis[i].childNodes[0].nodeValue
-            if leopard_class == 'R-leopard' or leopard_class == 'L-leopard':
+            if leopard_class == 'R-leopard' or leopard_class == 'L-leopard' or leopard_class == 'leopard':
                 name_obj.append('leopard')
                 xy = []
                 for ele in root.getElementsByTagName('polygon')[i].childNodes:

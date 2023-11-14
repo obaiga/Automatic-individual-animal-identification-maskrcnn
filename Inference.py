@@ -5,7 +5,7 @@
 
 
 """
-Mask R-CNN - Train on Leopard Dataset
+Mask R-CNN - Inference on Leopard Dataset
 """
 
 
@@ -14,6 +14,7 @@ Mask R-CNN - Train on Leopard Dataset
 ################################################################################
 # basic python
 from os.path import abspath,join,exists 
+from os import makedirs
 import sys
 import random
 import math
@@ -26,8 +27,9 @@ import matplotlib.pyplot as plt
 import glob
 get_ipython().run_line_magic('matplotlib', 'inline')
 import skimage.draw
-from scipy.io import loadmat
+from scipy.io import loadmat,savemat
 
+import copy
 from os import chdir
 main_dir = 'C:\\Users\SHF\Documents\GitHub\Automatic-individual-animal-identification-maskrcnn\Maskrcnn'
 chdir(main_dir)
@@ -41,10 +43,6 @@ from mrcnn.model import log
 from customPacks import utilsLeop
 ########################### END IMPORTS ########################################
 
-#%%
-## Check whether GPU is being or not
-from tensorflow.python.client import device_lib
-print(device_lib.list_local_devices())
 
 # In[Config]:
 # CLASS LeopardConfig
@@ -86,27 +84,42 @@ class LeopardConfig(Config):
     
 ########################### END CLASS LeopardConfig ###############################
 
-
-# In[ ]:
-# MAIN
-################################################################################
+class InferenceConfig(LeopardConfig):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
     
+
+
+#%%
 # Directory to save logs and trained model
 MODEL_DIR = join(main_dir, "logs")
 
+Model_Name ="mask_rcnn_snowleopard_0001.h5"
 # Local path to trained weights file
-COCO_MODEL_PATH = join(MODEL_DIR, "leopard_mask.h5")
-# Download COCO trained weights from Releases if needed
-if not exists(COCO_MODEL_PATH):
-    utils.download_trained_weights(COCO_MODEL_PATH)
+LEOPARD_MODEL_PATH = join(MODEL_DIR,Model_Name)
 
-LEOPARD_DIR = join(main_dir,"datasets/leopard")
+print(LEOPARD_MODEL_PATH)
 
 config = LeopardConfig()
-    
-    #%%
+config.display()
+
+#%%
+
+# Create model in inference mode
+inference_config = InferenceConfig()
+
+# Recreate the model in inference mode
+model = modellib.MaskRCNN(mode="inference", 
+                          config=inference_config,
+                          model_dir=MODEL_DIR)
+
+model.load_weights(LEOPARD_MODEL_PATH, by_name=True)
+print("Loading weights from ", LEOPARD_MODEL_PATH)
+
+#%%
 #### Dataset
 IMG_TYPE = 'JPG'
+LEOPARD_DIR = join(main_dir,"datasets/leopard")
 
 dataset_train = utilsLeop.LeopardDataset()
 dataset_train.load_leopard(LEOPARD_DIR,"train",IMG_TYPE)
@@ -116,7 +129,10 @@ dataset_val = utilsLeop.LeopardDataset()
 dataset_val.load_leopard(LEOPARD_DIR,"val",IMG_TYPE)
 dataset_val.prepare()
 
-#%%
+dataset_test = utilsLeop.LeopardDataset()
+dataset_test.load_leopard(LEOPARD_DIR,"test",IMG_TYPE)
+dataset_test.prepare()
+
 print("Training Image Count: {}".format(len(dataset_train.image_ids)))
 print("Class Count: {}".format(dataset_train.num_classes))
 for i, info in enumerate(dataset_train.class_info):
@@ -127,60 +143,32 @@ print("Class Count: {}".format(dataset_val.num_classes))
 for i, info in enumerate(dataset_val.class_info):
     print("{:3}. {:50}".format(i, info['name']))
     
-# In[]
-# Load and display random samples
-image_ids = np.random.choice(dataset_val.image_ids, 1)
-##self._image_ids = np.arange(self.num_images)
-
-for image_id in image_ids:
-    image = dataset_val.load_image(image_id)    #source from utils.py
-    mask, class_ids = dataset_val.load_mask(image_id)
-    visualize.display_top_masks(image, mask, class_ids, dataset_val.class_names,limit=1)
-
+print("Test Image Count: {}".format(len(dataset_test.image_ids)))
+print("Class Count: {}".format(dataset_test.num_classes))
+for i, info in enumerate(dataset_test.class_info):
+    print("{:3}. {:50}".format(i, info['name']))
 #%%
-# Create model in training mode
-model = modellib.MaskRCNN(mode="training", config=config,
-                          model_dir=MODEL_DIR)
-
-# Which weights to start with?
-init_with = "coco"  # imagenet, coco, or last
-init_with = "last"
-
-if init_with == "imagenet":
-    model.load_weights(model.get_imagenet_weights(), by_name=True)
-elif init_with == "coco":
-    #### Load weights trained on MS COCO, but skip layers that
-    ##### are different due to the different number of classes
-    ##### See README for instructions to download the COCO weights
-    model.load_weights(COCO_MODEL_PATH, by_name=True,
-                        exclude=["mrcnn_class_logits", "mrcnn_bbox_fc", 
-                                "mrcnn_bbox", "mrcnn_mask"])
-    # model.load_weights(COCO_MODEL_PATH, by_name=True)
+# Run object detection
+save_dir = join(main_dir,'results','leopard','test')
+if not exists(save_dir):
+    makedirs(save_dir)
     
-elif init_with == "last":
-    # Load the last model you trained and continue training
-    model.load_weights(model.find_last(), by_name=True)
-#%%
+req = copy.copy(dataset_test)
 
-# Train the head branches
-# Passing layers="heads" freezes all layers except the head
-# layers. You can also pass a regular expression to select
-# which layers to train by name pattern.
+for image_id in req.image_ids:
+    image = req.load_image(image_id)    #source from utils.py
+    result = model.detect([image])  
+    image_name = req.image_info[image_id]['id'][:-4]
+    
+    if len(result) > 1:
+        print(image_id,len(result))
+    else:
+        savemat(join(save_dir,image_name+'.mat'), result[0])
+    
+    #%%
+# image = dataset_val.load_image(image_id)    #source from utils.py
+# mask, class_ids = dataset_val.load_mask(image_id)
+visualize.display_top_masks(image, result[0]['masks'], result[0]['class_ids'],
+                            dataset_val.class_names,limit=1)
 
-model.train(dataset_train, dataset_val, 
-            learning_rate=config.LEARNING_RATE, 
-            epochs=1, 
-            layers='heads')
-
-#%%
-# Fine tune all layers
-# Passing layers="all" trains all layers. You can also 
-# pass a regular expression to select which layers to
-# train by name pattern.
-model.train(dataset_train, dataset_val, 
-            learning_rate=config.LEARNING_RATE / 10,
-            epochs=2, 
-            layers="all")
-
-############################### END  MAIN ######################################
 
