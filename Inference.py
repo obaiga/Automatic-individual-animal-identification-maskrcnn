@@ -15,18 +15,6 @@ Mask R-CNN - Inference on Leopard Dataset
 # basic python
 from os.path import abspath,join,exists 
 from os import makedirs
-import sys
-import random
-import math
-import re
-import time
-import numpy as np
-import cv2
-import matplotlib
-import matplotlib.pyplot as plt
-import glob
-get_ipython().run_line_magic('matplotlib', 'inline')
-import skimage.draw
 from scipy.io import loadmat,savemat
 
 import copy
@@ -35,10 +23,10 @@ main_dir = 'C:\\Users\SHF\Documents\GitHub\Automatic-individual-animal-identific
 chdir(main_dir)
 
 from mrcnn.config import Config
-from mrcnn import utils
+# from mrcnn import utils
 import mrcnn.model as modellib
 from mrcnn import visualize
-from mrcnn.model import log
+# from mrcnn.model import log
 
 from customPacks import utilsLeop
 ########################### END IMPORTS ########################################
